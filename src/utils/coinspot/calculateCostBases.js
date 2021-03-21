@@ -1,62 +1,73 @@
 const arraySort = require("array-sort");
 const sumBy = require("lodash/sumBy");
 
-const calculateCostBases = (type, transactions = []) => {
-  const sortedTransactions = {
-    buyorders: arraySort(transactions.buyorders, "created"),
-    sellorders: arraySort(transactions.sellorders, "created"),
-  };
-  let balance = 0;
-  let buyorders = arraySort(transactions.buyorders, "created").map((o) => {
-    o.realized = 0;
-    return o;
-  });
+const addZeroRealized = (order) => {
+  order.realized = 0;
 
-  sortedTransactions.sellorders = sortedTransactions.sellorders.map((order) => {
-    const filterByCreationDate = ({ created }) => created <= order.created;
+  return order;
+};
+const stripRealized = (order) => {
+  delete order.realized;
+
+  return order;
+};
+
+const filterByType = (type) => (order) => type === order.type;
+
+const calculateCostBases = (type, transactions = []) => {
+  const sortedTransactions = arraySort(transactions, "created");
+  let buyorders = sortedTransactions
+    .filter(filterByType("BUY"))
+    .map(addZeroRealized);
+  let sellorders = sortedTransactions.filter(filterByType("SELL"));
+
+  sellorders = sellorders.map((sellorder) => {
+    const filterByCreationDate = ({ created }) => created <= sellorder.created;
     const filterFullyRealizedBuyOrders = ({ realized, amount }) =>
       realized !== amount;
     let costBasis = [];
 
     buyorders = buyorders
-      .map((o) => {
-        if (o.created <= order.created) {
-          const amountNotRealised = order.amount - sumBy(costBasis, "amount");
+      .map((buyorder) => {
+        if (buyorder.created <= sellorder.created) {
+          const amountNotRealised =
+            sellorder.amount - sumBy(costBasis, "amount");
 
           if (amountNotRealised) {
-            const amountLeftUnrealized = o.amount - o.realized;
+            const amountLeftUnrealized = buyorder.amount - buyorder.realized;
             const realized =
               amountNotRealised > amountLeftUnrealized
                 ? amountLeftUnrealized
                 : amountLeftUnrealized - amountNotRealised;
 
-            const fraction = o.amount / realized;
+            const fraction = buyorder.amount / realized;
 
-            o.realized += realized;
+            buyorder.realized += realized;
 
             costBasis.push({
               amount: realized,
-              audtotal: o.audtotal / fraction,
+              audtotal: buyorder.audtotal / fraction,
             });
           }
         }
 
-        return o;
+        return buyorder;
       })
       .filter(filterFullyRealizedBuyOrders);
 
-    order.cost_basis = sumBy(costBasis, "audtotal");
-    order.profit = order.audtotal - order.cost_basis;
+    sellorder.cost_basis = sumBy(costBasis, "audtotal");
+    sellorder.profit = sellorder.audtotal - sellorder.cost_basis;
 
-    return order;
+    return sellorder;
   });
 
-  return {
-    buyorders: sortedTransactions.buyorders
-      .map(({ realized, ...rest }) => rest)
-      .reverse(),
-    sellorders: sortedTransactions.sellorders.reverse(),
-  };
+  return arraySort(
+    [
+      ...sortedTransactions.filter(filterByType("BUY")).map(stripRealized),
+      ...sellorders,
+    ],
+    "created"
+  );
 };
 
 module.exports = calculateCostBases;
