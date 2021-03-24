@@ -1,12 +1,14 @@
 const sum = require("lodash/sum");
 const router = require("express").Router({ mergeParams: true });
 const CryptoJS = require("crypto-js");
+const utils = require("../../../utils");
 
 const coinspotEndpoints = {
   balances: "/api/ro/my/balances",
   transactions: "/api/ro/my/transactions",
   withdrawals: "/api/ro/my/withdrawals",
   deposits: "/api/ro/my/deposits",
+  latest_prices: "/pubapi/latest",
 };
 
 const getPercentageDifference = (difference, original) => {
@@ -41,50 +43,60 @@ router.get("/", async (req, res, next) => {
       return api.coinspot.post(coinspotEndpoints[fetch_key], body, { headers });
     };
 
+    const { prices } = (
+      await api.coinspot.get(coinspotEndpoints.latest_prices)
+    ).data;
+
     const balances = await fetchCoinspot("balances");
     const { withdrawals } = (await fetchCoinspot("withdrawals")).data;
     const { deposits } = (await fetchCoinspot("deposits")).data;
     const { data: transactions } = await fetchCoinspot("transactions");
 
-    const data = balances.data.balances
-      .filter((coin) => {
-        const [shortName, balance] = Object.entries(coin)[0];
+    const removeAUDBalance = ({ short_name }) => short_name !== "AUD";
 
-        return shortName !== "AUD";
-      })
-      .map((coin) => {
-        const [shortName, balance] = Object.entries(coin)[0];
-        const { audbalance } = balance;
-        const filterByShortName = ({ market }) => market.includes(shortName);
+    const normalizedBalances = balances.data.balances
+      .map(utils.coinspot.normalizeCoinData)
+      .filter(removeAUDBalance);
 
-        const buy_orders = transactions.buyorders.filter(filterByShortName);
-        const sell_orders = transactions.sellorders.filter(filterByShortName);
+    const allBalances = utils.coinspot.getZeroBalanceCoins({
+      transactions,
+      balances: normalizedBalances,
+    });
 
-        const getAudTotal = ({ audtotal }) => audtotal;
-        const total_buy_order_amount = sum(buy_orders.map(getAudTotal));
-        const total_sell_order_amount = sum(sell_orders.map(getAudTotal));
-        const total_aud_spent =
-          total_buy_order_amount - total_sell_order_amount;
+    const data = allBalances.map((coin) => {
+      const { aud_balance, short_name } = coin;
+      const filterByShortName = ({ market }) => market.includes(short_name);
 
-        const profit = audbalance - total_aud_spent;
+      const buy_orders = transactions.buyorders.filter(filterByShortName);
+      const sell_orders = transactions.sellorders.filter(filterByShortName);
 
-        const percentage_difference = getPercentageDifference(
-          profit,
-          total_aud_spent
-        );
+      const getAudTotal = ({ audtotal }) => audtotal;
+      const total_buy_order_amount = sum(buy_orders.map(getAudTotal));
+      const total_sell_order_amount = sum(sell_orders.map(getAudTotal));
+      const total_aud_spent = total_buy_order_amount - total_sell_order_amount;
 
-        return {
-          profit,
-          shortName,
-          total_aud_spent,
-          total_buy_order_amount,
-          total_sell_order_amount,
-          percentage_difference,
-          ...balance,
-          buy_orders,
-          sell_orders,
-        };
-      });
+      const profit = aud_balance - total_aud_spent;
+
+      const percentage_difference = getPercentageDifference(
+        profit,
+        total_aud_spent
+      );
+
+      const gainz =
+        aud_balance + total_sell_order_amount - total_buy_order_amount;
+
+      return {
+        profit,
+        total_aud_spent,
+        total_buy_order_amount,
+        total_sell_order_amount,
+        percentage_difference,
+        ...coin,
+        buy_orders,
+        sell_orders,
+        gainz,
+      };
+    });
 
     const getAmount = ({ amount }) => amount;
     const getAudBalance = ({ audbalance }) => audbalance;
@@ -93,7 +105,7 @@ router.get("/", async (req, res, next) => {
     const total_withdrawals = sum(withdrawals.map(getAmount));
     const total_aud_spent = total_deposits - total_withdrawals;
 
-    const total_profit = sum(data.map(({ profit }) => profit));
+    const total_profit = sum(data.map(({ gainz }) => gainz));
     const total_coin_balance_in_aud = sum(data.map(getAudBalance));
     const total_percentage_difference = getPercentageDifference(
       total_profit,
@@ -110,6 +122,9 @@ router.get("/", async (req, res, next) => {
         aud_spent_plus_total_profit: total_aud_spent + total_profit,
         total_coin_balance_in_aud,
         balances: data,
+        withdrawals,
+        deposits,
+        transactions,
       },
     });
   } catch (error) {
