@@ -1,5 +1,6 @@
 const arraySort = require("array-sort");
 const sumBy = require("lodash/sumBy");
+const round = require("lodash/round");
 
 const COST_BASIS_TYPES = { FIFO: "FIFO", LIFO: "LIFO", HIFO: "HIFO" };
 
@@ -19,6 +20,13 @@ const filterByType = (type) => (order) => type === order.type;
 
 const getRate = (order) => order.fiat_value / order.amount;
 const compareByRate = (a, b) => getRate(a) - getRate(b);
+
+const getBuyAmountToBeRealized = (buyorder, amountToRealize) => {
+  const amountLeftUnrealized = buyorder.amount - buyorder.realized;
+  const shouldTakeRemainder = amountToRealize >= amountLeftUnrealized;
+
+  return shouldTakeRemainder ? amountLeftUnrealized : amountToRealize;
+};
 
 const basisTypeSortingScheme = {
   FIFO: (orders) => arraySort(orders, "created"),
@@ -42,21 +50,16 @@ const calculateCostBases = (type, transactions = []) => {
       realized !== amount;
     let costBasis = [];
 
-    buyorders = buyorders.map((buyorder) => {
+    buyorders = buyorders.map((buyorder, index) => {
       const canRealizedFrom =
         buyorder.created <= sellorder.created &&
         buyorder.realized < buyorder.amount;
 
       if (canRealizedFrom) {
-        const amountNotRealised = sellorder.amount - sumBy(costBasis, "amount");
+        const amountToRealize = sellorder.amount - sumBy(costBasis, "amount");
 
-        if (amountNotRealised) {
-          const amountLeftUnrealized = buyorder.amount - buyorder.realized;
-          const shouldTakeRemainder = amountNotRealised >= amountLeftUnrealized;
-
-          const realized = shouldTakeRemainder
-            ? amountLeftUnrealized
-            : amountLeftUnrealized - amountNotRealised;
+        if (amountToRealize) {
+          const realized = getBuyAmountToBeRealized(buyorder, amountToRealize);
 
           const fraction = buyorder.amount / realized;
 
@@ -73,7 +76,7 @@ const calculateCostBases = (type, transactions = []) => {
       return buyorder;
     });
 
-    sellorder.cost_basis = sumBy(costBasis, "fiat_value");
+    sellorder.cost_basis = round(sumBy(costBasis, "fiat_value"), 2);
 
     return sellorder;
   });
@@ -88,3 +91,7 @@ const calculateCostBases = (type, transactions = []) => {
 };
 
 module.exports = calculateCostBases;
+module.exports.addZeroRealized = addZeroRealized;
+module.exports.stripRealized = stripRealized;
+module.exports.getRate = getRate;
+module.exports.getBuyAmountToBeRealized = getBuyAmountToBeRealized;

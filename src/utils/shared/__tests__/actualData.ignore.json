@@ -1,0 +1,162 @@
+[
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.01559359,
+    "created": "2020-09-30T23:28:27.869Z",
+    "transaction_fee": 0.08065904,
+    "fiat_value": 8.15,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.01253237,
+    "created": "2020-10-13T05:51:35.658Z",
+    "transaction_fee": 0.06918118999999999,
+    "fiat_value": 6.99,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.43038149,
+    "created": "2020-10-21T22:38:58.700Z",
+    "transaction_fee": 2.47524752,
+    "fiat_value": 250,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.01313245,
+    "created": "2020-10-28T00:39:49.776Z",
+    "transaction_fee": 0.07694449,
+    "fiat_value": 7.77,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.02067654,
+    "created": "2020-11-24T01:26:38.973Z",
+    "transaction_fee": 0.18009473,
+    "fiat_value": 18.19,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.1735019,
+    "created": "2020-11-25T03:44:48.661Z",
+    "transaction_fee": 1.42840163,
+    "fiat_value": 144.27,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.12767152,
+    "created": "2020-12-09T11:20:16.981Z",
+    "transaction_fee": 0.99009901,
+    "fiat_value": 100,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.0127851,
+    "created": "2020-12-13T01:46:05.022Z",
+    "transaction_fee": 0.09900990000000001,
+    "fiat_value": 10,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.01259255,
+    "created": "2020-12-24T05:27:02.502Z",
+    "transaction_fee": 0.09900990000000001,
+    "fiat_value": 10,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.03324468,
+    "created": "2021-01-05T22:47:33.365Z",
+    "transaction_fee": 0.4950495,
+    "fiat_value": 50,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 2.23456299,
+    "created": "2021-01-11T08:38:19.063Z",
+    "transaction_fee": 32.84188119,
+    "fiat_value": 3317.03,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "SELL",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 3,
+    "created": "2021-01-25T21:57:37.621Z",
+    "transaction_fee": 52.58545455,
+    "fiat_value": 5205.96,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 2.05079972,
+    "created": "2021-01-31T23:05:41.759Z",
+    "transaction_fee": 36.48514851,
+    "fiat_value": 3685,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.96703259,
+    "created": "2021-02-09T21:22:08.313Z",
+    "transaction_fee": 22.77227723,
+    "fiat_value": 2300,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "BUY",
+    "otc": false,
+    "market": "ETH/AUD",
+    "amount": 0.17425076,
+    "created": "2021-02-11T01:58:59.608Z",
+    "transaction_fee": 3.98019802,
+    "fiat_value": 402,
+    "fiat_currency": "AUD"
+  },
+  {
+    "type": "SELL",
+    "otc": false,
+    "market": "ETH/VET",
+    "amount": 1.27875825,
+    "created": "2021-04-02T05:33:50.637Z",
+    "transaction_fee": 33.52167361,
+    "fiat_value": 3318.65,
+    "fiat_currency": "AUD"
+  }
+]
