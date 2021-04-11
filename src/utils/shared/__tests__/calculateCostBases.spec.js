@@ -27,7 +27,7 @@ const createTransaction = (transaction = {}) => {
   };
 };
 
-describe("utils/coinspot/calculateCostBases", () => {
+describe("utils/shared/calculateCostBases", () => {
   const cost_basis_types = ["FIFO", "FILO", "FIHO"];
 
   const transactions = [

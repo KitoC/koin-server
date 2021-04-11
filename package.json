@@ -22,5 +22,10 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
+  },
+  "jest": {
+    "testMatch": [
+      "**/?(*.)+(spec|test).[jt]s?(x)"
+    ]
   }
 }

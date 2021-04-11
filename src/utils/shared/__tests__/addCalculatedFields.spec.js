@@ -1,58 +1,65 @@
 const addCalculatedFields = require("../addCalculatedFields");
 
-describe("utils/coinspot/addCalculatedFields", () => {
-  describe("when provided a coinspot coin balance object", () => {
-    it("normalizes the coin balance into expected shape", () => {
-      const transactions = {
-        buyorders: [
-          {
-            market: "BTC/AUD",
-            amount: 6,
-            created: "2021-02-13T05:20:50.534Z",
-            audfeeExGst: 0.1,
-            audGst: 0.1,
-            audtotal: 6,
-          },
-        ],
-        sellorders: [
-          {
-            market: "BTC/AUD",
-            amount: 1,
-            created: "2021-02-13T05:20:50.534Z",
-            audfeeExGst: 0.1,
-            audGst: 0.1,
-            audtotal: 1,
-          },
-          {
-            market: "DOGE/AUD",
-            amount: 1,
-            created: "2021-02-13T05:20:50.534Z",
-            audfeeExGst: 0.1,
-            audGst: 0.1,
-            audtotal: 1,
-          },
-        ],
-      };
+describe("utils/shared/addCalculatedFields", () => {
+  describe("when provided a coin balance object and transactions", () => {
+    const transactions = require("./testData.ignore");
 
-      const coin = { short_name: "BTC", rate: 2, balance: 5, aud_balance: 10 };
-      const getCoinTransactions = (t) => t.market.includes("BTC");
+    const coin = { short_name: "BTC", rate: 2, balance: 100, fiat_value: 200 };
 
-      const expectedResult = {
-        ...coin,
-        unrealized_profit: 6,
-        total_buy_order_amount: 6,
-        total_sell_order_amount: 1,
-        percentage_difference: 100,
-        buy_orders: transactions.buyorders.filter(getCoinTransactions),
-        sell_orders: transactions.sellorders.filter(getCoinTransactions),
-        gainz: 5,
-      };
+    const getResults = (cost_basis_type = "FIFO") =>
+      addCalculatedFields({
+        transactions,
+        coin,
+        options: { cost_basis_type },
+      });
 
-      // console.
+    [
+      {
+        describeText: "FIFO",
+        expected: {
+          unrealized_profit: 100,
+        },
+      },
+      {
+        describeText: "LIFO",
+        expected: {
+          unrealized_profit: 150,
+        },
+      },
+      {
+        describeText: "HIFO",
+        expected: {
+          unrealized_profit: 100,
+        },
+      },
+    ].forEach(({ describeText, expected }) => {
+      const result = getResults(describeText);
 
-      expect(addCalculatedFields({ transactions, coin })).toEqual(
-        expectedResult
-      );
+      describe(`when ${describeText}`, () => {
+        it("adds coins own transactions to coin object", () => {
+          expect(result.transactions.length).toEqual(3);
+        });
+
+        it("adds unrealized profit to coin object", () => {
+          expect(result.unrealized_profit).toEqual(expected.unrealized_profit);
+        });
+
+        // it("adds cost basis to coin object", () => {
+        //   expect(result.cost_basis).toEqual(3);
+        // });
+
+        // it("sums the amount of fiat spent and adds to coin object as 'total_fiat_spent'", () => {
+        //   expect(result.total_buy_order_amount).toEqual(10);
+        // });
+
+        // it("sums the amount of fiat spent and adds to coin object as 'total_fiat_spent'", () => {
+        //   expect(result.total_sell_order_amount).toEqual(1);
+        // });
+
+        // it("sums the amount of fiat spent and adds to coin object as 'total_fiat_spent'", () => {
+        //   expect(result.total_fiat_spent).toEqual(10);
+        // });
+      });
     });
   });
 });

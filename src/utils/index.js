@@ -1,3 +1,3 @@
-module.exports = {
-  coinspot: require("./coinspot"),
-};
+const autoLoader = require("./autoLoader");
+
+module.exports = autoLoader(__dirname);
