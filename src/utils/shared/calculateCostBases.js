@@ -28,6 +28,13 @@ const getBuyAmountToBeRealized = (buyorder, amountToRealize) => {
   return shouldTakeRemainder ? amountLeftUnrealized : amountToRealize;
 };
 
+const getNexCostBasis = (buyorder, realized) => {
+  const fraction = buyorder.amount / realized;
+  const fiat_value = buyorder.fiat_value / fraction;
+
+  return { amount: realized, fiat_value };
+};
+
 const basisTypeSortingScheme = {
   FIFO: (orders) => arraySort(orders, "created"),
   LIFO: (orders) => arraySort(orders, "created", { reverse: true }),
@@ -45,31 +52,22 @@ const calculateCostBases = (type, transactions = []) => {
   let sellorders = sortedTransactions.filter(filterByType("SELL"));
 
   sellorders = sellorders.map((sellorder) => {
-    const filterByCreationDate = ({ created }) => created <= sellorder.created;
-    const filterFullyRealizedBuyOrders = ({ realized, amount }) =>
-      realized !== amount;
     let costBasis = [];
 
     buyorders = buyorders.map((buyorder, index) => {
-      const canRealizedFrom =
+      const canRealizeFrom =
         buyorder.created <= sellorder.created &&
         buyorder.realized < buyorder.amount;
 
-      if (canRealizedFrom) {
+      if (canRealizeFrom) {
         const amountToRealize = sellorder.amount - sumBy(costBasis, "amount");
 
         if (amountToRealize) {
           const realized = getBuyAmountToBeRealized(buyorder, amountToRealize);
 
-          const fraction = buyorder.amount / realized;
-
           buyorder.realized += realized;
 
-          const fiat_value = buyorder.fiat_value / fraction;
-
-          const nextCostBasis = { amount: realized, fiat_value };
-
-          costBasis.push(nextCostBasis);
+          costBasis.push(getNexCostBasis(buyorder, realized));
         }
       }
 
