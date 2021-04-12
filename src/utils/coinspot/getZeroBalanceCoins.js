@@ -15,7 +15,7 @@ const getZeroBalanceCoins = ({ transactions, balances }) => {
     if (shouldAdd && !nextBalances.find((b) => b.short_name === short_name)) {
       const normalizedCoin = {
         short_name,
-        aud_balance: 0,
+        fiat_value: 0,
         balance: 0,
         rate: 0,
       };

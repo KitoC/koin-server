@@ -1,4 +1,5 @@
 const getZeroBalanceCoins = require("../getZeroBalanceCoins");
+const normalizeCoinData = require("../normalizeCoinData");
 
 describe("utils/coinspot/getZeroBalanceCoins", () => {
   describe("when provided transaction history and current balances", () => {
@@ -17,12 +18,14 @@ describe("utils/coinspot/getZeroBalanceCoins", () => {
           },
         ],
       };
+
       const balances = [
-        { short_name: "BTC", rate: 0.1, balance: 1, aud_balance: 0.1 },
+        { short_name: "BTC", rate: 0.1, balance: 1, fiat_value: 0.1 },
       ];
+
       const expectedResult = [
-        { short_name: "BTC", rate: 0.1, balance: 1, aud_balance: 0.1 },
-        { short_name: "VTHO", rate: 0, balance: 0, aud_balance: 0 },
+        { short_name: "BTC", rate: 0.1, balance: 1, fiat_value: 0.1 },
+        { short_name: "VTHO", rate: 0, balance: 0, fiat_value: 0 },
       ];
 
       expect(getZeroBalanceCoins({ transactions, balances })).toEqual(

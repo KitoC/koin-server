@@ -80,10 +80,7 @@ const calculateCostBases = (type, transactions = []) => {
   });
 
   return arraySort(
-    [
-      ...sortedTransactions.filter(filterByType("BUY")).map(stripRealized),
-      ...sellorders,
-    ],
+    [...sortedTransactions.filter(filterByType("BUY")), ...sellorders],
     "created"
   );
 };

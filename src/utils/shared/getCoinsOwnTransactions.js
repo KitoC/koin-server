@@ -1,7 +1,9 @@
-const getCoinTransactions = (coin, transactions) => {
+const getCoinsOwnTransactions = (coin, transactions) => {
   return transactions.filter((transaction) => {
-    return transaction.market.includes(coin.short_name);
+    const [transactionShortName] = transaction.market.split("/");
+
+    return transactionShortName == coin.short_name;
   });
 };
 
-module.exports = getCoinTransactions;
+module.exports = getCoinsOwnTransactions;

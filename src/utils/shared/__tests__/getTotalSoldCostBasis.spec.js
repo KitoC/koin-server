@@ -22,7 +22,7 @@ describe("utils/shared/getTotalSoldCostBasis", () => {
     ].forEach(({ describeText, expected }) => {
       const transactions = calculateCostBases(
         describeText,
-        getCoinsOwnTransactions(coin, require("./testData.ignore"))
+        getCoinsOwnTransactions(coin, require("./testData/testData.ignore"))
       );
 
       const result = getTotalSoldCostBasis(transactions);

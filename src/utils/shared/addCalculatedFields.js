@@ -2,17 +2,12 @@ const sum = require("lodash/sum");
 const getCoinsOwnTransactions = require("./getCoinsOwnTransactions");
 const calculateCostBases = require("./calculateCostBases");
 const getTotalSoldCostBasis = require("./getTotalSoldCostBasis");
+const getUnrealizedCostBasis = require("./getUnrealizedCostBasis");
+const getRealizedProfit = require("./getRealizedProfit");
 
 const getPercentageDifference = (difference, original) => {
   return (difference / original) * 100;
 };
-
-// const getCoinsOwnTransactionsWithCostBasis = (coin, transactions) => {
-//   return calculateCostBases(
-//     options.cost_basis_type,
-//     getCoinsOwnTransactions(coin, transactions)
-//   );
-// };
 
 const addCalculatedFields = ({
   transactions: all_transactions,
@@ -27,33 +22,20 @@ const addCalculatedFields = ({
   );
 
   const getAudTotal = ({ audtotal }) => audtotal;
-  // const total_buy_order_amount = sum(buy_orders.map(getAudTotal));
-  // const total_sell_order_amount = sum(sell_orders.map(getAudTotal));
-  // const total_aud_spent = total_buy_order_amount - total_sell_order_amount;
 
-  // const profit = aud_balance - total_aud_spent;
+  const realized_cost_basis = getTotalSoldCostBasis(transactions);
+  const unrealized_cost_basis = getUnrealizedCostBasis(transactions);
 
-  // const percentage_difference = getPercentageDifference(
-  //   profit,
-  //   total_aud_spent
-  // );
-
-  // const gainz = aud_balance + total_sell_order_amount - total_buy_order_amount;
-
-  const total_sold_cost_basis = getTotalSoldCostBasis(transactions);
-
-  const unrealized_profit = fiat_value - total_sold_cost_basis;
+  const unrealized_profit = fiat_value - unrealized_cost_basis;
+  const realized_profit = getRealizedProfit(transactions);
 
   return {
-    // profit,
-    // total_aud_spent,
-    // total_buy_order_amount,
-    // total_sell_order_amount,
-    // percentage_difference,
-    unrealized_profit,
     ...coin,
+    realized_profit,
+    unrealized_profit,
+    realized_cost_basis,
+    unrealized_cost_basis,
     transactions,
-    // gainz,
   };
 };
 
