@@ -96,8 +96,28 @@ router.get("/", async (req, res, next) => {
       total_aud_spent
     );
 
+    const total_fiat = sum(data.map(({ fiat_value }) => fiat_value));
+    const total_unrealized_profit = sum(
+      data.map(({ unrealized_profit }) => unrealized_profit)
+    );
+    const total_unrealized_cost_basis = sum(
+      data.map(({ unrealized_cost_basis }) => unrealized_cost_basis)
+    );
+    const total_realized_profit = sum(
+      data.map(({ realized_profit }) => realized_profit)
+    );
+    const total_realized_cost_basis = sum(
+      data.map(({ realized_cost_basis }) => realized_cost_basis)
+    );
+
     res.json({
       data: {
+        total_fiat,
+        total_unrealized_profit,
+        total_unrealized_cost_basis,
+        total_realized_profit,
+        total_realized_cost_basis,
+        net_fiat_invested: total_aud_spent,
         total_aud_spent,
         total_percentage_difference,
         total_deposits,
