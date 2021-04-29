@@ -85,6 +85,7 @@ router.get("/", async (req, res, next) => {
     const getAmount = ({ amount }) => amount;
     const getAudBalance = ({ audbalance }) => audbalance;
 
+    // console.log;
     const total_deposits = sum(deposits.map(getAmount));
     const total_withdrawals = sum(withdrawals.map(getAmount));
     const total_aud_spent = total_deposits - total_withdrawals;

@@ -29,15 +29,23 @@ app.use((req, res, next) => {
 
 app.use(apiRoutes);
 
-const errorHandler = (error, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
+  let error = err;
+
+  if (err.response) {
+    error = err.response.data.errors;
+  }
+
   if (process.env.NODE_ENV !== "test") {
     console.log("\nERROR\n");
     console.error(error);
     console.log("\nERROR\n");
   }
 
-  res.set("Content-Type", "application/json");
-  res.status(isNumber(error.status) ? error.status : 400).json({ error });
+  console.log(error.status);
+  const status = res.set("Content-Type", "application/json");
+  res.status(isNumber(error.status) ? error.status : 400);
+  res.json({ error });
 };
 
 app.use(errorHandler);

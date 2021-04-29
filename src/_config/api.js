@@ -6,14 +6,21 @@ const dotenv = require("dotenv");
 dotenv.config();
 const nonces = [];
 
-const makeCoinspotAxiosInstance = () => {
-  const coinspotApi = axios.create({ baseURL: process.env.COINSPOT_URL });
+const makeCoinspotAxiosInstance = (options) => {
+  const coinspotApi = axios.create(options);
 
   return coinspotApi;
 };
 
 const api = {
-  coinspot: makeCoinspotAxiosInstance(),
+  coinspot: makeCoinspotAxiosInstance({ baseURL: process.env.COINSPOT_URL }),
+  userService: makeCoinspotAxiosInstance({
+    baseURL: process.env.USER_SERVICE_URL,
+    headers: {
+      secretkey: process.env.USER_SERVICE_SECRET_KEY,
+      appid: process.env.USER_SERVICE_APP_ID,
+    },
+  }),
 };
 
 module.exports = api;
