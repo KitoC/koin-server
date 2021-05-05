@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 4242;
 const DOMAIN = process.env.DOMAIN || "localhost";
 
 dotenv.config();
-const corsOptions = { origin: "*" };
+
+const corsOptions = { origin: process.env.CORS_URL || "*" };
 
 app.use(cors(corsOptions));
 
