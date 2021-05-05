@@ -19,6 +19,7 @@ const api = {
     headers: {
       secretkey: process.env.USER_SERVICE_SECRET_KEY,
       appid: process.env.USER_SERVICE_APP_ID,
+      internalkey: process.env.INTERNAL_KEY,
     },
   }),
 };
