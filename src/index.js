@@ -12,7 +12,12 @@ const DOMAIN = process.env.DOMAIN || "localhost";
 
 dotenv.config();
 
-const corsOptions = { origin: process.env.CORS_URL || "*" };
+const corsOptions = {
+  origin: process.env.CORS_URL || "*",
+  optionsSuccessStatus: 200,
+};
+
+console.log("CORS --> ", corsOptions);
 
 app.use(cors(corsOptions));
 
