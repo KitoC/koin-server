@@ -6,4 +6,5 @@ It uses a central user-service microservice that I have built (https://github.co
 
 TODO:
 - Add installation and setup instrcutions to README
+- Add Travis pipeline to Github
  
